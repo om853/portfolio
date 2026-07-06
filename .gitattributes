@@ -1,0 +1,41 @@
+* text=auto eol=lf
+
+# PHP
+*.php text diff=php
+
+# JavaScript
+*.js text
+*.jsx text
+*.mjs text
+*.cjs text
+
+# CSS
+*.css text
+
+# JSON
+*.json text
+
+# Markdown
+*.md text
+
+# Env
+*.env text eol=lf
+*.env.example text eol=lf
+
+# Binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+
+# Config
+*.yml text
+*.yaml text
+*.toml text
+*.xml text

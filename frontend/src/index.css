@@ -1,0 +1,205 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #ffffff;
+  --color-secondary: #a1a1a1;
+  --color-tertiary: #000000;
+  --color-error: #6b6b6b;
+  --font-headline: "Inter", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+}
+
+:root {
+  --bg-color: #f5f5f5;
+  --text-color: #1a1a1a;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --accent: #000000;
+  --accent-soft: rgba(0, 0, 0, 0.3);
+  --accent-bg: #e5e5e5;
+  --cursor-dot: #000000;
+  --cursor-ring: rgba(0,0,0,0.3);
+}
+
+html.dark {
+  --bg-color: #10131b; /* softer dark gray instead of pure black */
+  --text-color: #e6eef6; /* gentle off-white for readability */
+  --glass-bg: rgba(18, 20, 28, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.07);
+  --accent: #cbd5df; /* subtle gray accent */
+  --accent-soft: rgba(203, 213, 223, 0.18);
+  --accent-bg: #181b24;
+  --cursor-dot: #e6eef6;
+  --cursor-ring: rgba(230,238,246,0.12);
+}
+
+html, body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-body);
+  scroll-behavior: smooth;
+}
+
+/* Only hide cursor when CustomCursor is successfully mounted (not on touch laptops) */
+body.custom-cursor-active,
+body.custom-cursor-active * {
+  cursor: none !important;
+}
+
+/* Premium Glassmorphism */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Gradients */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 50%, var(--color-tertiary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent-soft);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+  50% { box-shadow: 0 0 40px rgba(0, 0, 0, 0.2); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+::selection {
+  background-color: var(--accent);
+  color: var(--bg-color);
+}
+
+/* Command Palette overrides */
+[cmdk-overlay] {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+/* Admin layout additions */
+.admin-bg {
+  background: linear-gradient(180deg, #050505 0%, #111111 100%);
+}
+html.dark .admin-sidebar {
+  background-color: #070707;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+html.dark .admin-header {
+  background-color: rgba(10, 10, 10, 0.85);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+html:not(.dark) .admin-bg {
+  background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+}
+html:not(.dark) .admin-sidebar {
+  background-color: #ffffff;
+  border-color: rgba(15, 23, 42, 0.08);
+}
+html:not(.dark) .admin-header {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-bottom-color: rgba(15, 23, 42, 0.06);
+}
+html:not(.dark) .light-section {
+  background-color: #f8fafc !important;
+}
+html:not(.dark) .light-card {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+}
+html:not(.dark) .light-input {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+html:not(.dark) .light-input::placeholder {
+  color: #94a3b8 !important;
+}
+html:not(.dark) .light-border {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+html:not(.dark) .light-text {
+  color: #0f172a !important;
+}
+html:not(.dark) .light-muted {
+  color: #64748b !important;
+}
+
+/* Global Light Mode Overrides for Cards in Admin Layout */
+html:not(.dark) .light-card .bg-white\/5 {
+  background-color: #f1f5f9 !important;
+}
+html:not(.dark) .light-card .border-white\/5 {
+  border-color: #e2e8f0 !important;
+}
+html:not(.dark) .light-card .text-white {
+  color: #0f172a !important;
+}
+html:not(.dark) .light-card .text-\[\#adaaaa\] {
+  color: #64748b !important;
+}
+html:not(.dark) .light-card .hover\:bg-white\/5:hover {
+  background-color: #f8fafc !important;
+}
+html:not(.dark) .light-card .divide-white\/5 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #e2e8f0 !important;
+}
+html:not(.dark) .light-card .bg-\[\#2c2c2c\] {
+  background-color: #f1f5f9 !important;
+}
+html:not(.dark) .light-card code.text-white {
+  color: #0f172a !important;
+  background-color: #f1f5f9 !important;
+}
+html:not(.dark) .light-card span.text-white {
+  color: #0f172a !important;
+}
+html:not(.dark) .admin-sidebar .text-\[\#adaaaa\] {
+  color: #64748b !important;
+}
+html:not(.dark) .admin-sidebar .hover\:bg-white\/8:hover {
+  background-color: #f1f5f9 !important;
+}
+html:not(.dark) .admin-sidebar .hover\:text-white:hover {
+  color: #0f172a !important;
+}
+
+
+
+/* Public UI improvements: neutralize very-dark blacks and use a balanced gray palette.
+   Admin-specific styles (admin-*) remain intentionally scoped and unchanged. */

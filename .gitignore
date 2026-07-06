@@ -1,0 +1,17 @@
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+screen.png
+myImage.png
+code.html
+package-lock.json
+package.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
