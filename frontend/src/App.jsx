@@ -1,21 +1,28 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import Home from './pages/public/Home';
 import Login from './pages/admin/Login';
-import DashboardIndex from './pages/admin/DashboardIndex';
-import ProjectsPage from './pages/admin/ProjectsPage';
-import MessagesPage from './pages/admin/MessagesPage';
-import ApiKeysPage from './pages/admin/ApiKeysPage';
-import SkillsPage from './pages/admin/SkillsPage';
-import ExperiencesPage from './pages/admin/ExperiencesPage';
-import TestimonialsPage from './pages/admin/TestimonialsPage';
-import LeadsPage from './pages/admin/LeadsPage';
-import TeamPage from './pages/admin/TeamPage';
-import SettingsPage from './pages/admin/SettingsPage';
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
+
+const DashboardIndex = lazy(() => import('./pages/admin/DashboardIndex'));
+const ProjectsPage = lazy(() => import('./pages/admin/ProjectsPage'));
+const MessagesPage = lazy(() => import('./pages/admin/MessagesPage'));
+const ApiKeysPage = lazy(() => import('./pages/admin/ApiKeysPage'));
+const SkillsPage = lazy(() => import('./pages/admin/SkillsPage'));
+const ExperiencesPage = lazy(() => import('./pages/admin/ExperiencesPage'));
+const TestimonialsPage = lazy(() => import('./pages/admin/TestimonialsPage'));
+const LeadsPage = lazy(() => import('./pages/admin/LeadsPage'));
+const TeamPage = lazy(() => import('./pages/admin/TeamPage'));
+const SettingsPage = lazy(() => import('./pages/admin/SettingsPage'));
+
+const AdminFallback = () => (
+  <div className="min-h-screen bg-[#0e0e0e] flex items-center justify-center">
+    <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
+  </div>
+);
 
 function App() {
   return (
@@ -23,27 +30,24 @@ function App() {
       <AuthProvider>
         <LanguageProvider>
           <Routes>
-            {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
 
-            {/* Admin Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route element={<AdminLayout />}>
-                <Route path="/dashboard" element={<DashboardIndex />} />
-                <Route path="/dashboard/projects" element={<ProjectsPage />} />
-                <Route path="/dashboard/skills" element={<SkillsPage />} />
-                <Route path="/dashboard/experiences" element={<ExperiencesPage />} />
-                <Route path="/dashboard/messages" element={<MessagesPage />} />
-                <Route path="/dashboard/testimonials" element={<TestimonialsPage />} />
-                <Route path="/dashboard/leads" element={<LeadsPage />} />
-                <Route path="/dashboard/team" element={<TeamPage />} />
-                <Route path="/dashboard/api-keys" element={<ApiKeysPage />} />
-                <Route path="/dashboard/settings" element={<SettingsPage />} />
+                <Route path="/dashboard" element={<Suspense fallback={<AdminFallback />}><DashboardIndex /></Suspense>} />
+                <Route path="/dashboard/projects" element={<Suspense fallback={<AdminFallback />}><ProjectsPage /></Suspense>} />
+                <Route path="/dashboard/skills" element={<Suspense fallback={<AdminFallback />}><SkillsPage /></Suspense>} />
+                <Route path="/dashboard/experiences" element={<Suspense fallback={<AdminFallback />}><ExperiencesPage /></Suspense>} />
+                <Route path="/dashboard/messages" element={<Suspense fallback={<AdminFallback />}><MessagesPage /></Suspense>} />
+                <Route path="/dashboard/testimonials" element={<Suspense fallback={<AdminFallback />}><TestimonialsPage /></Suspense>} />
+                <Route path="/dashboard/leads" element={<Suspense fallback={<AdminFallback />}><LeadsPage /></Suspense>} />
+                <Route path="/dashboard/team" element={<Suspense fallback={<AdminFallback />}><TeamPage /></Suspense>} />
+                <Route path="/dashboard/api-keys" element={<Suspense fallback={<AdminFallback />}><ApiKeysPage /></Suspense>} />
+                <Route path="/dashboard/settings" element={<Suspense fallback={<AdminFallback />}><SettingsPage /></Suspense>} />
               </Route>
             </Route>
 
-            {/* 404 Page */}
             <Route path="*" element={<div className="min-h-screen bg-[#0e0e0e] light-section flex flex-col items-center justify-center text-white light-text p-4">
               <h1 className="text-9xl font-black text-gray-900/5 dark:text-white/10 absolute select-none pointer-events-none">404</h1>
               <div className="relative z-10 text-center">

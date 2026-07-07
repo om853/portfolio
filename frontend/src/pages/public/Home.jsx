@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import api from '../../services/api';
 import ScrollToTopButton from '../../components/ScrollToTopButton';
 import ScrollProgress from '../../components/ScrollProgress';
@@ -8,19 +8,25 @@ import NoiseOverlay from '../../components/NoiseOverlay';
 import Marquee from '../../components/Marquee';
 import WhatsAppBubble from '../../components/WhatsAppBubble';
 import AIChatBubble from '../../components/AIChatBubble';
-
+import Navbar from '../../components/sections/Navbar';
 import Hero from '../../components/sections/Hero';
 import About from '../../components/sections/About';
-import Experience from '../../components/sections/Experience';
-import Statistics from '../../components/sections/Statistics';
-import Projects from '../../components/sections/Projects';
-import Skills from '../../components/sections/Skills';
-import Services from '../../components/sections/Services';
-import Certificates from '../../components/sections/Certificates';
-import Testimonials from '../../components/sections/Testimonials';
-import Contact from '../../components/sections/Contact';
-import Navbar from '../../components/sections/Navbar';
-import Footer from '../../components/sections/Footer';
+
+const Experience = lazy(() => import('../../components/sections/Experience'));
+const Statistics = lazy(() => import('../../components/sections/Statistics'));
+const Projects = lazy(() => import('../../components/sections/Projects'));
+const Skills = lazy(() => import('../../components/sections/Skills'));
+const Services = lazy(() => import('../../components/sections/Services'));
+const Certificates = lazy(() => import('../../components/sections/Certificates'));
+const Testimonials = lazy(() => import('../../components/sections/Testimonials'));
+const Contact = lazy(() => import('../../components/sections/Contact'));
+const Footer = lazy(() => import('../../components/sections/Footer'));
+
+const SectionFallback = () => (
+  <div className="py-24 flex items-center justify-center">
+    <div className="w-6 h-6 border-2 border-gray-900 dark:border-white border-t-transparent rounded-full animate-spin" />
+  </div>
+);
 
 const Home = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -36,8 +42,6 @@ const Home = () => {
         trackView();
     }, []);
 
-    // no persisted grayscale toggle — public UI uses improved global gray palette
-
     return (
         <>
             {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
@@ -51,16 +55,16 @@ const Home = () => {
                     <Hero />
                     <Marquee />
                     <About />
-                    <Experience />
-                    <Statistics />
-                    <Projects />
-                    <Skills />
-                    <Services />
-                    <Certificates />
-                    <Testimonials />
-                    <Contact />
+                    <Suspense fallback={<SectionFallback />}><Experience /></Suspense>
+                    <Suspense fallback={<SectionFallback />}><Statistics /></Suspense>
+                    <Suspense fallback={<SectionFallback />}><Projects /></Suspense>
+                    <Suspense fallback={<SectionFallback />}><Skills /></Suspense>
+                    <Suspense fallback={<SectionFallback />}><Services /></Suspense>
+                    <Suspense fallback={<SectionFallback />}><Certificates /></Suspense>
+                    <Suspense fallback={<SectionFallback />}><Testimonials /></Suspense>
+                    <Suspense fallback={<SectionFallback />}><Contact /></Suspense>
                 </main>
-                <Footer />
+                <Suspense fallback={null}><Footer /></Suspense>
                 <ScrollToTopButton />
                 <WhatsAppBubble />
                 <AIChatBubble />
