@@ -8,19 +8,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\LoginNotification;
 
 class AuthController extends Controller
 {
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        // Constructor logic if needed
-    }
-
     /**
      * Get a JWT via given credentials.
      *
@@ -32,6 +24,18 @@ class AuthController extends Controller
 
         if (! $token = auth('api')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        try {
+            $user = auth('api')->user();
+            Mail::to('mrmhmdalshhatly@gmail.com')->send(new LoginNotification(
+                $user->name,
+                $user->email,
+                $request->ip(),
+                $request->userAgent() ?? 'Unknown'
+            ));
+        } catch (\Exception $e) {
+            // Log but don't break login
         }
 
         return $this->respondWithToken($token);

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NewContactNotification;
 
 class MessageController extends Controller
 {
@@ -23,6 +25,18 @@ class MessageController extends Controller
         ]);
 
         $message = Message::create($validated);
+
+        try {
+            Mail::to('mrmhmdalshhatly@gmail.com')->send(new NewContactNotification(
+                $validated['name'],
+                $validated['email'],
+                $validated['phone'] ?? null,
+                $validated['message']
+            ));
+        } catch (\Exception $e) {
+            // Log but don't break the response
+        }
+
         return response()->json($message, 201);
     }
 
