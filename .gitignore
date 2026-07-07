@@ -5,7 +5,8 @@ node_modules/
 *.log
 .DS_Store
 screen.png
-myImage.png
+/myImage.png
+!frontend/public/myImage.png
 code.html
 package-lock.json
 package.json
