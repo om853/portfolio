@@ -19,6 +19,7 @@ const Statistics = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-gray-900/5 dark:from-white/5 to-gray-600/5 dark:to-gray-400/5 pointer-events-none" />
             
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <h2 className="sr-only">Statistics</h2>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
                     {stats.map((stat, idx) => (
                         <TiltCard key={stat.label} className="w-full">

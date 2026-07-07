@@ -5,11 +5,10 @@ import TiltCard from '../TiltCard';
 import MeshGradient from '../ui/MeshGradient';
 import Particles from '../ui/Particles';
 import { useLanguage } from '../../context/LanguageContext';
-import { useAuth } from '../../context/AuthContext';
 
 const Hero = () => {
     const { t } = useLanguage();
-    const { user } = useAuth();
+    const [heroImage, setHeroImage] = useState(null);
     const titleAnimation = useAnimation();
     const subtitleAnimation = useAnimation();
     const buttonsAnimation = useAnimation();
@@ -66,6 +65,14 @@ const Hero = () => {
         subtitleAnimation.start({ opacity: [0, 1], y: [20, 0], transition: { duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] } });
         buttonsAnimation.start({ opacity: [0, 1], y: [20, 0], transition: { duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] } });
         imageAnimation.start({ opacity: [0, 1], scale: [0.9, 1], transition: { duration: 1.2, delay: 0.4, ease: [0.16, 1, 0.3, 1] } });
+    }, []);
+
+    useEffect(() => {
+        import('../../services/api').then(mod => {
+            mod.default.get('/public-profile/').then(r => {
+                if (r.data?.hero_image) setHeroImage(r.data.hero_image);
+            }).catch(() => {});
+        });
     }, []);
 
     return (
@@ -141,9 +148,10 @@ const Hero = () => {
                 >
                     <TiltCard className="relative w-full max-w-sm aspect-[4/5] sm:aspect-square md:aspect-[3/4] rounded-2xl overflow-hidden border border-black/10 dark:border-slate-700/50 group shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(15,23,42,0.35)]">
                                 <motion.img 
-                                    src={user?.hero_image || "/myImage.png"} 
+                                    src={heroImage || "/hero-placeholder.svg"} 
                                     alt="Omar Mohamed - Frontend Developer" 
                                     className="w-full h-full object-cover transition-all duration-1000 scale-110 group-hover:scale-100" 
+                                    fetchpriority="high" 
                                 />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-500 opacity-80 group-hover:opacity-60" />
                         

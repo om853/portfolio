@@ -23,14 +23,14 @@ const Footer = () => {
                     
                     <div className="flex flex-col sm:flex-row gap-12 sm:gap-24 md:justify-end">
                         <div className="flex flex-col space-y-4 items-start">
-                            <h4 className="text-gray-900 dark:text-white text-[0.65rem] font-bold uppercase tracking-widest mb-2">Connect</h4>
+                            <h2 className="text-gray-900 dark:text-white text-[0.65rem] font-bold uppercase tracking-widest mb-2">Connect</h2>
                             <a href="https://github.com/om853" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm font-bold transition-colors">GitHub</a>
                             <a href="https://www.linkedin.com/in/omar-mohamed-406143374" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm font-bold transition-colors">LinkedIn</a>
                             <a href="https://wa.me/201507044651" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm font-bold transition-colors">WhatsApp</a>
                         </div>
                         
                         <div className="flex flex-col space-y-4 items-start">
-                            <h4 className="text-gray-900 dark:text-white text-[0.65rem] font-bold uppercase tracking-widest mb-2">Explore</h4>
+                            <h2 className="text-gray-900 dark:text-white text-[0.65rem] font-bold uppercase tracking-widest mb-2">Explore</h2>
                             <a href="#work" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm font-bold transition-colors">{t('nav_work')}</a>
                             <a href="#about" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm font-bold transition-colors">{t('nav_about')}</a>
                             <a href="#skills" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm font-bold transition-colors">{t('nav_skills')}</a>

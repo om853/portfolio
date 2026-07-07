@@ -53,9 +53,9 @@ const Certificates = () => {
                         className="p-6 sm:p-8 rounded-2xl bg-gray-50 dark:bg-slate-950 border border-dashed border-black/10 dark:border-slate-700/50 flex flex-col items-center justify-center text-center min-h-[200px] hover:border-gray-900/20 dark:hover:border-slate-500/30 transition-all"
                     >
                         <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
-                            <span className="material-symbols-outlined text-[#adaaaa] text-2xl">add</span>
+                            <span className="material-symbols-outlined text-gray-400 text-2xl">add</span>
                         </div>
-                        <p className="text-[#adaaaa] text-sm font-bold">More certificates coming soon</p>
+                        <p className="text-gray-400 text-sm font-bold">More certificates coming soon</p>
                     </motion.div>
                 </div>
             </div>

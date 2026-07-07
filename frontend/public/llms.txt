@@ -1,0 +1,19 @@
+# Omar Mohamed — Full Stack Developer
+> Full Stack Developer building modern web applications with React, Laravel, and PHP.
+
+## About
+Omar Mohamed Elshahat is a Full Stack Developer from Zagazig, Egypt, specializing in React.js, Laravel, and PHP development.
+
+## Contact
+- Email: mrmhmdalshhatly@gmail.com
+- WhatsApp: +201507044651
+- GitHub: https://github.com/om853
+- LinkedIn: https://www.linkedin.com/in/omar-mohamed-406143374
+
+## Skills
+- Frontend: React.js, Next.js, Tailwind CSS, Framer Motion, JavaScript
+- Backend: Laravel, PHP, REST APIs
+- Database: MySQL, Supabase
+
+## Projects
+Full-stack web applications built with React.js and Laravel, featuring responsive design, animations, and database-driven content.

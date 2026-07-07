@@ -96,7 +96,7 @@ const Testimonials = () => {
                                     />
                                 </div>
                                 <div>
-                                    <h4 className="text-gray-900 dark:text-white font-bold text-sm uppercase tracking-tight">{item.name}</h4>
+                                    <h3 className="text-gray-900 dark:text-white font-bold text-sm uppercase tracking-tight">{item.name}</h3>
                                     <p className="text-gray-900 dark:text-white text-[0.65rem] font-bold uppercase tracking-widest mt-0.5">{item.position}</p>
                                 </div>
                             </div>

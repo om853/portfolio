@@ -61,7 +61,7 @@ const SkillCard = ({ skill, index, levelColor, progressColor }) => {
             </div>
             <AnimatedBar level={skill.level} color={progressColor} delay={index * 0.06 + 0.15} />
             <div className="flex justify-between mt-1.5">
-                <span className="text-[0.5rem] uppercase tracking-widest text-gray-300 dark:text-gray-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity">{skill.level}%</span>
+                <span className="text-[0.5rem] uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity">{skill.level}%</span>
             </div>
         </motion.div>
     );
