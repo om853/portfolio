@@ -26,15 +26,17 @@ class MessageController extends Controller
 
         $message = Message::create($validated);
 
-        try {
-            Mail::to('mrmhmdalshhatly@gmail.com')->send(new NewContactNotification(
-                $validated['name'],
-                $validated['email'],
-                $validated['phone'] ?? null,
-                $validated['message']
-            ));
-        } catch (\Exception $e) {
-            // Log but don't break the response
+        if (config('mail.default') !== 'log') {
+            try {
+                Mail::to('mrmhmdalshhatly@gmail.com')->send(new NewContactNotification(
+                    $validated['name'],
+                    $validated['email'],
+                    $validated['phone'] ?? null,
+                    $validated['message']
+                ));
+            } catch (\Exception $e) {
+                // Log but don't break the response
+            }
         }
 
         return response()->json($message, 201);
