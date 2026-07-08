@@ -4,11 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Message;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\ReplyToClient;
+use App\Services\ResendService;
+use Illuminate\Support\Facades\Log;
 
 class MailController extends Controller
 {
+    protected $resend;
+
+    public function __construct(ResendService $resend)
+    {
+        $this->resend = $resend;
+    }
+
     public function reply(Request $request)
     {
         $validated = $request->validate([
@@ -19,27 +27,35 @@ class MailController extends Controller
 
         $message = Message::findOrFail($validated['message_id']);
 
-        \Log::channel('mail')->info('Attempting to send email reply', [
+        \Log::channel('mail')->info('Attempting to send email reply via Resend', [
             'message_id' => $message->id,
             'to' => $message->email,
             'subject' => $validated['subject'],
-            'config' => [
-                'host' => config('mail.mailers.smtp.host'),
-                'port' => config('mail.mailers.smtp.port'),
-                'encryption' => config('mail.mailers.smtp.encryption'),
-                'timeout' => config('mail.mailers.smtp.timeout'),
-            ],
         ]);
 
         try {
-            Mail::to($message->email)->send(new ReplyToClient(
+            // Reuse the existing HTML structure from ReplyToClient
+            $mailable = new ReplyToClient(
                 $message->name,
                 $message->email,
                 $validated['subject'],
                 $validated['body']
-            ));
+            );
 
-            \Log::channel('mail')->info('Email sent successfully', [
+            // Use reflection to call the private buildHtml method
+            $reflection = new \ReflectionClass($mailable);
+            $method = $reflection->getMethod('buildHtml');
+            $method->setAccessible(true);
+            $html = $method->invoke($mailable);
+
+            $this->resend->sendEmail(
+                $message->email,
+                $validated['subject'],
+                $html,
+                'Omar Mohamed <mrmhmdalshhatly@gmail.com>' // Adjusted 'from' to look professional
+            );
+
+            \Log::channel('mail')->info('Email sent successfully via Resend', [
                 'message_id' => $message->id,
                 'to' => $message->email,
             ]);
@@ -49,14 +65,13 @@ class MailController extends Controller
                 'replied_at' => now(),
             ]);
 
-            return response()->json(['message' => 'Email sent successfully']);
+            return response()->json(['message' => 'Email sent successfully via Resend']);
         } catch (\Exception $e) {
-            \Log::channel('mail')->error('Email sending failed', [
+            \Log::channel('mail')->error('Resend sending failed', [
                 'message_id' => $message->id,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json(['error' => 'Failed to send email: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to send email via Resend: ' . $e->getMessage()], 500);
         }
     }
 }
