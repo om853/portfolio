@@ -21,6 +21,7 @@ const Login = () => {
             await login(credentials.email, credentials.password);
             navigate('/dashboard');
         } catch (err) {
+            console.error('Login error details:', err);
             if (err.response?.status === 401) {
                 setError('Invalid email or password');
             } else if (err.code === 'ERR_NETWORK' || !err.response) {

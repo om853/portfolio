@@ -14,9 +14,10 @@ const api = axios.create({
     },
 });
 
-// Request interceptor to add JWT token
+// Request interceptor to add JWT token and log requests
 api.interceptors.request.use(
     (config) => {
+        console.log('📡 Request:', config.method.toUpperCase(), config.baseURL.replace(/\/+$/, '') + config.url);
         const token = localStorage.getItem('access_token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -30,6 +31,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
+        console.error('❌ Axios Error:', error.code, error.message, error.config?.url);
         const originalRequest = error.config;
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
