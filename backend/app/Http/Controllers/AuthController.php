@@ -20,24 +20,29 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $credentials = $request->only(['email', 'password']);
-
-        if (! $token = auth('api')->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
         try {
-            Mail::to('mrmhmdalshhatly@gmail.com')->send(new LoginNotification(
-                auth('api')->user()->name,
-                auth('api')->user()->email,
-                $request->ip(),
-                $request->userAgent() ?? 'Unknown'
-            ));
-        } catch (\Exception $e) {
-            // Log but don't break login
-        }
+            $credentials = $request->only(['email', 'password']);
 
-        return $this->respondWithToken($token);
+            if (! $token = auth('api')->attempt($credentials)) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            try {
+                Mail::to('mrmhmdalshhatly@gmail.com')->send(new LoginNotification(
+                    auth('api')->user()->name,
+                    auth('api')->user()->email,
+                    $request->ip(),
+                    $request->userAgent() ?? 'Unknown'
+                ));
+            } catch (\Exception $e) {
+                \Log::error('Login notification email failed: ' . $e->getMessage());
+            }
+
+            return $this->respondWithToken($token);
+        } catch (\Throwable $e) {
+            \Log::error('Login failed: ' . $e->getMessage() . '\n' . $e->getTraceAsString());
+            return response()->json(['error' => 'Server error: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
