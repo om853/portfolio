@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 const getBaseURL = () => {
-    // In development, Vite proxy handles /api/* -> backend
-    // Production: use VITE_API_URL or relative path
-    return import.meta.env.VITE_API_URL || '/api/';
+    const url = import.meta.env.VITE_API_URL || '/api/';
+    console.log('🚀 Current API Base URL:', url);
+    return url;
 };
 
 const api = axios.create({
