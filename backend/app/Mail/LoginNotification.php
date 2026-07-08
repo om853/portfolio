@@ -38,7 +38,7 @@ class LoginNotification extends Mailable
         );
     }
 
-    private function buildHtml(): string
+    public function buildHtml(): string
     {
         return "
         <!DOCTYPE html>

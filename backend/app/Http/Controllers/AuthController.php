@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\LoginNotification;
+use App\Services\ResendService;
 
 class AuthController extends Controller
 {
@@ -28,12 +29,18 @@ class AuthController extends Controller
             }
 
             try {
-                Mail::to('mrmhmdalshhatly@gmail.com')->send(new LoginNotification(
+                $notification = new LoginNotification(
                     auth('api')->user()->name,
                     auth('api')->user()->email,
                     $request->ip(),
                     $request->userAgent() ?? 'Unknown'
-                ));
+                );
+                $resend = app(ResendService::class);
+                $resend->sendEmail(
+                    'mrmhmdalshhatly@gmail.com',
+                    "Dashboard Login: " . auth('api')->user()->name,
+                    $notification->buildHtml()
+                );
             } catch (\Exception $e) {
                 \Log::error('Login notification email failed: ' . $e->getMessage());
             }
