@@ -52,7 +52,7 @@ class MailController extends Controller
                 $message->email,
                 $validated['subject'],
                 $html,
-                'Omar Mohamed <mrmhmdalshhatly@gmail.com>' // Adjusted 'from' to look professional
+                'onboarding@resend.dev'
             );
 
             \Log::channel('mail')->info('Email sent successfully via Resend', [
