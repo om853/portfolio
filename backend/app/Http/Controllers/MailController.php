@@ -19,6 +19,18 @@ class MailController extends Controller
 
         $message = Message::findOrFail($validated['message_id']);
 
+        \Log::channel('mail')->info('Attempting to send email reply', [
+            'message_id' => $message->id,
+            'to' => $message->email,
+            'subject' => $validated['subject'],
+            'config' => [
+                'host' => config('mail.mailers.smtp.host'),
+                'port' => config('mail.mailers.smtp.port'),
+                'encryption' => config('mail.mailers.smtp.encryption'),
+                'timeout' => config('mail.mailers.smtp.timeout'),
+            ],
+        ]);
+
         try {
             Mail::to($message->email)->send(new ReplyToClient(
                 $message->name,
@@ -27,6 +39,11 @@ class MailController extends Controller
                 $validated['body']
             ));
 
+            \Log::channel('mail')->info('Email sent successfully', [
+                'message_id' => $message->id,
+                'to' => $message->email,
+            ]);
+
             $message->update([
                 'is_read' => true,
                 'replied_at' => now(),
@@ -34,6 +51,11 @@ class MailController extends Controller
 
             return response()->json(['message' => 'Email sent successfully']);
         } catch (\Exception $e) {
+            \Log::channel('mail')->error('Email sending failed', [
+                'message_id' => $message->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return response()->json(['error' => 'Failed to send email: ' . $e->getMessage()], 500);
         }
     }
