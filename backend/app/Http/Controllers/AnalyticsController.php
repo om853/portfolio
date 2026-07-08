@@ -178,18 +178,33 @@ class AnalyticsController extends Controller
             ];
         }
 
-        // Hits by date (last 30 days for chart)
-        $hitsByDate = PageHit::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
+        // Hits by date (last 30 days for chart) - database agnostic
+        $isMysql = config('database.default') === 'mysql';
+        $dateSql = $isMysql ? 'DATE(created_at)' : "strftime('%Y-%m-%d', created_at)";
+        $hitsByDate = PageHit::select(DB::raw($dateSql . ' as date'), DB::raw('count(*) as count'))
             ->where('created_at', '>=', $now->copy()->subDays(30))
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get();
 
-        // Hits by day of week (for a secondary chart)
-        $hitsByDayOfWeek = PageHit::select(DB::raw('DAYNAME(created_at) as day'), DB::raw('count(*) as count'))
-            ->groupBy('day')
-            ->orderByRaw("FIELD(DAYNAME(created_at), 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')")
-            ->get();
+        // Hits by day of week (for a secondary chart) - database agnostic
+        if ($isMysql) {
+            $hitsByDayOfWeek = PageHit::select(DB::raw('DAYNAME(created_at) as day'), DB::raw('count(*) as count'))
+                ->groupBy('day')
+                ->orderByRaw("FIELD(DAYNAME(created_at), 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')")
+                ->get();
+        } else {
+            $dowSql = "strftime('%w', created_at)";
+            $hits = PageHit::select(DB::raw($dowSql . ' as dow'), DB::raw('count(*) as count'))
+                ->groupBy('dow')
+                ->get();
+            $dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            $hitsByDayOfWeek = collect($hits)->map(function ($hit) use ($dayNames) {
+                return ['day' => $dayNames[$hit->dow], 'count' => $hit->count];
+            })->sortBy(function ($item) use ($dayNames) {
+                return array_search($item['day'], $dayNames);
+            })->values();
+        }
 
         return response()->json([
             'total_projects' => Project::count(),
