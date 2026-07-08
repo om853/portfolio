@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\LoginNotification;
 
 class AuthController extends Controller
 {
@@ -22,6 +24,17 @@ class AuthController extends Controller
 
         if (! $token = auth('api')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        try {
+            Mail::to('mrmhmdalshhatly@gmail.com')->send(new LoginNotification(
+                auth('api')->user()->name,
+                auth('api')->user()->email,
+                $request->ip(),
+                $request->userAgent() ?? 'Unknown'
+            ));
+        } catch (\Exception $e) {
+            // Log but don't break login
         }
 
         return $this->respondWithToken($token);
