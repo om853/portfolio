@@ -14,6 +14,7 @@ class AnalyticsController extends Controller
 {
     public function stats()
     {
+        try {
         $now = Carbon::now();
         $weekStart = $now->copy()->startOfWeek();
         $lastWeekStart = $weekStart->copy()->subWeek();
@@ -218,6 +219,10 @@ class AnalyticsController extends Controller
             'hits_by_date' => $hitsByDate,
             'hits_by_day_of_week' => $hitsByDayOfWeek,
         ]);
+        } catch (\Throwable $e) {
+            \Log::error('Stats failed: ' . $e->getMessage() . '\n' . $e->getTraceAsString());
+            return response()->json(['error' => 'Stats error: ' . $e->getMessage()], 500);
+        }
     }
 
     public function track(Request $request)
