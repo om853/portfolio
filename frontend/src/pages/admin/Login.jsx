@@ -24,7 +24,7 @@ const Login = () => {
             if (err.response?.status === 401) {
                 setError('Invalid email or password');
             } else if (err.code === 'ERR_NETWORK' || !err.response) {
-                setError('Cannot reach server. Make sure the backend is running on port 8000.');
+                setError('Unable to connect to the server. Please check your connection or try again later.');
             } else {
                 setError(err.response?.data?.error || err.message || 'Login failed');
             }
