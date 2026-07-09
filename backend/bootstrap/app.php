@@ -23,4 +23,11 @@ return Application::configure(basePath: dirname(__DIR__))
             $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
             return $response;
         });
+        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+        });
     })->create();
