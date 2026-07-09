@@ -26,6 +26,20 @@ Route::get('fix-admin', function() {
     return response()->json(['message' => 'Admin role fixed']);
 });
 
+Route::get('test-mail', function() {
+    try {
+        $resend = app(\App\Services\ResendService::class);
+        $result = $resend->sendEmail(
+            'mrmhmdalshhatly@gmail.com',
+            'Test from Railway ' . now()->toDateTimeString(),
+            '<p>If you see this, Resend is working on Railway.</p>'
+        );
+        return response()->json(['success' => true, 'id' => $result->id ?? 'sent']);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+    }
+});
+
 Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'
