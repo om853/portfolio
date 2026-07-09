@@ -188,11 +188,18 @@ class AnalyticsController extends Controller
             ->get();
 
         // Hits by day of week (for a secondary chart) - database agnostic
+        // FIX: Use raw SQL to avoid ONLY_FULL_GROUP_BY issues in MySQL
         if ($isMysql) {
-            $hitsByDayOfWeek = PageHit::select(DB::raw('DAYNAME(created_at) as day'), DB::raw('count(*) as count'))
-                ->groupBy('day')
-                ->orderByRaw("FIELD(DAYNAME(created_at), 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')")
-                ->get();
+            $hitsByDayOfWeek = DB::select("
+                SELECT 
+                    DAYNAME(created_at) as day,
+                    COUNT(*) as count
+                FROM page_hits
+                GROUP BY DAYNAME(created_at)
+                ORDER BY FIELD(DAYNAME(created_at), 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
+            ");
+            // Convert to collection for consistency
+            $hitsByDayOfWeek = collect($hitsByDayOfWeek);
         } else {
             $dowSql = "strftime('%w', created_at)";
             $hits = PageHit::select(DB::raw($dowSql . ' as dow'), DB::raw('count(*) as count'))
@@ -255,3 +262,4 @@ class AnalyticsController extends Controller
         return response()->json(['message' => 'Tracked'], 201);
     }
 }
+
