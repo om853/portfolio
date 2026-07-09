@@ -7,6 +7,7 @@ import Home from './pages/public/Home';
 import Login from './pages/admin/Login';
 import AdminLayout from './layouts/AdminLayout';
 import ToastContainer from './components/ui/ToastContainer';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const DashboardIndex = lazy(() => import('./pages/admin/DashboardIndex'));
 const ProjectsPage = lazy(() => import('./pages/admin/ProjectsPage'));
