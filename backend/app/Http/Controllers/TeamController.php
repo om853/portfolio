@@ -12,16 +12,21 @@ class TeamController extends Controller
 {
     public function index()
     {
-        return response()->json(User::all());
+        return response()->json(
+            User::where('role', '!=', 'admin')->get()
+        );
     }
 
     public function store(Request $request)
     {
-        $this->authorizeAdmin();
+        $authResponse = $this->authorizeAdmin();
+        if ($authResponse !== true) {
+            return $authResponse;
+        }
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:6',
             'role' => ['required', Rule::in(['admin', 'team'])],
         ]);
@@ -31,10 +36,10 @@ class TeamController extends Controller
         }
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'password' => Hash::make($request->input('password')),
+            'role' => $request->input('role'),
         ]);
 
         return response()->json($user, 201);
@@ -42,39 +47,59 @@ class TeamController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $this->authorizeAdmin();
+        $authResponse = $this->authorizeAdmin();
+        if ($authResponse !== true) {
+            return $authResponse;
+        }
+
+        if ($user->id === 1) {
+            return response()->json(['message' => 'The owner cannot be modified by other admins'], 403);
+        }
 
         $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|max:255',
-            'email' => ['sometimes', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'role' => ['sometimes', Rule::in(['admin', 'team'])],
+            'name' => 'sometimes|required|string|max:255',
+            'email' => ['sometimes', 'required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'role' => ['sometimes', 'required', Rule::in(['admin', 'team'])],
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $user->update($request->only(['name', 'email', 'role']));
+        $data = $request->only(['name', 'email', 'role']);
+        if ($request->filled('name')) $data['name'] = $request->input('name');
+        if ($request->filled('email')) $data['email'] = $request->input('email');
+        if ($request->filled('role')) $data['role'] = $request->input('role');
+
+        $user->update($data);
 
         return response()->json($user);
     }
 
     public function destroy(User $user)
     {
-        $this->authorizeAdmin();
+        $authResponse = $this->authorizeAdmin();
+        if ($authResponse !== true) {
+            return $authResponse;
+        }
 
-        if ($user->id === auth()->id()) {
-            return response()->json(['error' => 'You cannot delete yourself.'], 403);
+        if ($user->id === 1) {
+            return response()->json(['message' => 'Cannot delete the owner'], 403);
         }
 
         $user->delete();
-        return response()->json(['message' => 'Team member removed successfully.']);
+
+        return response()->json(null, 204);
     }
 
     private function authorizeAdmin()
     {
-        if (auth()->user()->role !== 'admin') {
-            return response()->json(['error' => 'Unauthorized. Only admins can perform this action.'], 403);
+        $user = auth('api')->user();
+
+        if (!$user || $user->role !== 'admin') {
+            return response()->json(['message' => 'Access denied: Admin privileges required'], 403);
         }
+
+        return true;
     }
 }
