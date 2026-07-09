@@ -190,9 +190,12 @@ class AnalyticsController extends Controller
         // Hits by day of week (for a secondary chart) - database agnostic
         if ($isMysql) {
             $hitsByDayOfWeek = PageHit::select(DB::raw('DAYNAME(created_at) as day'), DB::raw('count(*) as count'))
-                ->groupBy('day')
-                ->orderByRaw("FIELD(DAYNAME(created_at), 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')")
+                ->groupBy(DB::raw('DAYNAME(created_at)'))
                 ->get();
+            $dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            $hitsByDayOfWeek = collect($hitsByDayOfWeek)->sortBy(function ($item) use ($dayOrder) {
+                return array_search($item->day, $dayOrder);
+            })->values();
         } else {
             $dowSql = "strftime('%w', created_at)";
             $hits = PageHit::select(DB::raw($dowSql . ' as dow'), DB::raw('count(*) as count'))
