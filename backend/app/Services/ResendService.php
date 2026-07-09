@@ -16,8 +16,10 @@ class ResendService
         $this->client = Resend::client($apiKey);
     }
 
-    public function sendEmail($to, $subject, $html, $from = 'onboarding@resend.dev')
+    public function sendEmail($to, $subject, $html, $from = null)
     {
+        $from = $from ?: 'noreply@' . env('RESEND_DOMAIN', 'devomarelshahat.vercle.app');
+
         try {
             $response = $this->client->emails->send([
                 'from' => $from,
