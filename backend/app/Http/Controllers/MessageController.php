@@ -6,6 +6,7 @@ use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NewContactNotification;
+use App\Services\ResendService;
 
 class MessageController extends Controller
 {
@@ -27,14 +28,20 @@ class MessageController extends Controller
         $message = Message::create($validated);
 
         try {
-            Mail::to('mrmhmdalshhatly@gmail.com')->send(new NewContactNotification(
+            $notification = new NewContactNotification(
                 $validated['name'],
                 $validated['email'],
                 $validated['phone'] ?? null,
                 $validated['message']
-            ));
+            );
+            $resend = app(ResendService::class);
+            $resend->sendEmail(
+                'mrmhmdalshhatly@gmail.com',
+                "New Contact Message from {$validated['name']}",
+                $notification->buildHtml()
+            );
         } catch (\Exception $e) {
-            // Log but don't break the response
+            \Log::error('Contact notification email failed: ' . $e->getMessage());
         }
 
         return response()->json($message, 201);
