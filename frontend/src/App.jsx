@@ -1,11 +1,12 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import { LanguageProvider } from './context/LanguageContext';
 import Home from './pages/public/Home';
 import Login from './pages/admin/Login';
 import AdminLayout from './layouts/AdminLayout';
-import ProtectedRoute from './components/ProtectedRoute';
+import ToastContainer from './components/ui/ToastContainer';
 
 const DashboardIndex = lazy(() => import('./pages/admin/DashboardIndex'));
 const ProjectsPage = lazy(() => import('./pages/admin/ProjectsPage'));
@@ -27,9 +28,10 @@ const AdminFallback = () => (
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <LanguageProvider>
-          <Routes>
+      <ToastProvider>
+        <AuthProvider>
+          <LanguageProvider>
+            <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
 
@@ -57,9 +59,11 @@ function App() {
               </div>
             </div>} />
           </Routes>
+          <ToastContainer />
         </LanguageProvider>
       </AuthProvider>
-    </Router>
+    </ToastProvider>
+  </Router>
   );
 }
 
