@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 
 const TeamPage = () => {
     const [team, setTeam] = useState([]);
@@ -12,6 +13,7 @@ const TeamPage = () => {
         name: '', email: '', password: '', role: 'team'
     });
     const [submitting, setSubmitting] = useState(false);
+    const { addToast } = useToast();
 
     useEffect(() => { 
         fetchTeam(); 
@@ -33,7 +35,7 @@ const TeamPage = () => {
             const response = await api.get('/team');
             setTeam(response.data);
         } catch (error) {
-            console.error('Failed to fetch team');
+            addToast('Failed to fetch team', 'error');
         } finally {
             setLoading(false);
         }
@@ -74,7 +76,8 @@ const TeamPage = () => {
             setShowModal(false);
             fetchTeam();
         } catch (error) {
-            alert(editingUser ? 'Failed to update team member' : 'Failed to create team member');
+            const errMsg = error.response?.data?.message || error.response?.data?.errors ? Object.values(error.response.data.errors).flat().join(', ') : 'Failed to create team member';
+            addToast(editingUser ? `Failed to update team member: ${errMsg}` : `Failed to create team member: ${errMsg}`, 'error');
         } finally {
             setSubmitting(false);
         }
@@ -86,7 +89,7 @@ const TeamPage = () => {
             await api.delete(`/team/${id}`);
             fetchTeam();
         } catch (error) {
-            alert('Failed to remove team member');
+            addToast('Failed to remove team member', 'error');
         }
     };
 
