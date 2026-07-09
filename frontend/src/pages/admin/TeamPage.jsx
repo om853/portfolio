@@ -30,7 +30,7 @@ const TeamPage = () => {
     const fetchTeam = async () => {
         setLoading(true);
         try {
-            const response = await api.get('/team/');
+            const response = await api.get('/team');
             setTeam(response.data);
         } catch (error) {
             console.error('Failed to fetch team');
@@ -67,9 +67,9 @@ const TeamPage = () => {
         setSubmitting(true);
         try {
             if (editingUser) {
-                await api.put(`/team/${editingUser.id}/`, formData);
+                await api.put(`/team/${editingUser.id}`, formData);
             } else {
-                await api.post('/team/', formData);
+                await api.post('/team', formData);
             }
             setShowModal(false);
             fetchTeam();
@@ -83,7 +83,7 @@ const TeamPage = () => {
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to remove this team member?')) return;
         try {
-            await api.delete(`/team/${id}/`);
+            await api.delete(`/team/${id}`);
             fetchTeam();
         } catch (error) {
             alert('Failed to remove team member');

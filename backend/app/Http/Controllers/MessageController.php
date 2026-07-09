@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Message;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NewContactNotification;
@@ -40,6 +41,19 @@ class MessageController extends Controller
                 "New Contact Message from {$validated['name']}",
                 $notification->buildHtml()
             );
+
+            $teamMembers = User::where('role', 'team')->get();
+            foreach ($teamMembers as $member) {
+                try {
+                    $resend->sendEmail(
+                        $member->email,
+                        "New Contact Message from {$validated['name']}",
+                        $notification->buildHtml()
+                    );
+                } catch (\Exception $inner) {
+                    \Log::error("Team notification email failed for {$member->email}: " . $inner->getMessage());
+                }
+            }
         } catch (\Exception $e) {
             \Log::error('Contact notification email failed: ' . $e->getMessage());
         }

@@ -17,6 +17,11 @@ class TeamController extends Controller
         );
     }
 
+    public function show(User $user)
+    {
+        return response()->json($user);
+    }
+
     public function store(Request $request)
     {
         $authResponse = $this->authorizeAdmin();
