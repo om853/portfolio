@@ -62,7 +62,7 @@ Route::get('config/imgbb-key', function (ApiKeyRotationService $rotation) {
         return response()->json(['key' => $keyModel->key]);
     }
 
-    return response()->json(['key' => env('IMGBB_API_KEY')]);
+    return response()->json(['key' => env('IMGBB_API_KEY', '8b3c2419670d982a3cc27940c66a65e5')]);
 });
 Route::get('projects/', [ProjectController::class, 'index']);
 Route::get('projects/{project}/', [ProjectController::class, 'show']);
