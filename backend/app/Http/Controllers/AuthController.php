@@ -135,7 +135,7 @@ class AuthController extends Controller
         if ($request->has('avatar')) {
             $user->avatar = $request->get('avatar');
         }
-        if ($request->has('hero_image')) {
+        if ($request->has('hero_image') && $user->id === 1) {
             $user->hero_image = $request->get('hero_image');
         }
 

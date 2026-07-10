@@ -116,6 +116,7 @@ const SettingsPage = () => {
                         </div>
                     </div>
 
+                    {user?.id === 1 && (
                     <div className="p-6 bg-white/5 rounded-2xl border border-white/10 light-border space-y-4">
                         <h3 className="text-sm font-bold text-white light-text uppercase tracking-widest">Hero Section Image</h3>
                         {formData.hero_image && (
@@ -139,6 +140,7 @@ const SettingsPage = () => {
                         </div>
                         <p className="text-[0.6rem] text-[#adaaaa] light-muted">This image will be displayed in the background or side of the hero section.</p>
                     </div>
+                    )}
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div className="space-y-1">
