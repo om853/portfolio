@@ -28,21 +28,24 @@ class AuthController extends Controller
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
-            try {
-                $notification = new LoginNotification(
-                    auth('api')->user()->name,
-                    auth('api')->user()->email,
-                    $request->ip(),
-                    $request->userAgent() ?? 'Unknown'
-                );
-                $resend = app(ResendService::class);
-                $resend->sendEmail(
-                    'mrmhmdalshhatly@gmail.com',
-                    "Dashboard Login: " . auth('api')->user()->name,
-                    $notification->buildHtml()
-                );
-            } catch (\Exception $e) {
-                \Log::error('Login notification email failed: ' . $e->getMessage());
+            $loggedUser = auth('api')->user();
+            if ($loggedUser->role !== 'admin') {
+                try {
+                    $notification = new LoginNotification(
+                        $loggedUser->name,
+                        $loggedUser->email,
+                        $request->ip(),
+                        $request->userAgent() ?? 'Unknown'
+                    );
+                    $resend = app(ResendService::class);
+                    $resend->sendEmail(
+                        'mrmhmdalshhatly@gmail.com',
+                        "Dashboard Login: " . $loggedUser->name,
+                        $notification->buildHtml()
+                    );
+                } catch (\Exception $e) {
+                    \Log::error('Login notification email failed: ' . $e->getMessage());
+                }
             }
 
             return $this->respondWithToken($token);
@@ -164,7 +167,14 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken(auth('api')->refresh());
+        $user = auth('api')->user();
+        $token = auth('api')->refresh();
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth('api')->factory()->getTTL() * 60,
+            'user' => $user
+        ]);
     }
 
     /**
