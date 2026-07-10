@@ -27,14 +27,13 @@ class MailController extends Controller
 
         $message = Message::findOrFail($validated['message_id']);
 
-        \Log::channel('mail')->info('Attempting to send email reply via Resend', [
+        \Log::channel('mail')->info('Sending email reply', [
             'message_id' => $message->id,
             'to' => $message->email,
             'subject' => $validated['subject'],
         ]);
 
         try {
-            // Reuse the existing HTML structure from ReplyToClient
             $mailable = new ReplyToClient(
                 $message->name,
                 $message->email,
@@ -42,7 +41,6 @@ class MailController extends Controller
                 $validated['body']
             );
 
-            // Use reflection to call the private buildHtml method
             $reflection = new \ReflectionClass($mailable);
             $method = $reflection->getMethod('buildHtml');
             $method->setAccessible(true);
@@ -51,11 +49,10 @@ class MailController extends Controller
             $this->resend->sendEmail(
                 $message->email,
                 $validated['subject'],
-                $html,
-                'onboarding@resend.dev'
+                $html
             );
 
-            \Log::channel('mail')->info('Email sent successfully via Resend', [
+            \Log::channel('mail')->info('Email sent successfully', [
                 'message_id' => $message->id,
                 'to' => $message->email,
             ]);
@@ -65,13 +62,13 @@ class MailController extends Controller
                 'replied_at' => now(),
             ]);
 
-            return response()->json(['message' => 'Email sent successfully via Resend']);
+            return response()->json(['message' => 'Email sent successfully']);
         } catch (\Exception $e) {
             \Log::channel('mail')->error('Resend sending failed', [
                 'message_id' => $message->id,
                 'error' => $e->getMessage(),
             ]);
-            return response()->json(['error' => 'Failed to send email via Resend: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to send email: ' . $e->getMessage()], 500);
         }
     }
 }
