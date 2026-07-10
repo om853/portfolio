@@ -13,7 +13,7 @@ class ResendService
 
     public function __construct()
     {
-        $this->apiKey = env('MAILERSEND_API_KEY', 'mlsn.cc30df0289cb5fc9464f13bd2709213927e397a0e5756bec0be77de7d41c6083');
+        $this->apiKey = env('MAILERSEND_API_KEY', 'mlsn.c6a4446e6a91bf0a81e0262020e014bdf2761cec897c66655473a759dfc7d8d0');
         $this->fromEmail = env('MAILERSEND_FROM_EMAIL', 'MS_MUlyNh@test-65qngkdq9xwlwr12.mlsender.net');
         $this->client = new Client(['base_uri' => 'https://api.mailersend.com']);
     }
