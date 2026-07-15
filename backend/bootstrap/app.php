@@ -20,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             \Illuminate\Http\Middleware\HandleCors::class,
         ]);
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // Handle JWT auth exceptions → return 401
@@ -49,9 +52,16 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json(['error' => 'Unauthenticated'], 401);
             }
         });
-        // Add CORS headers to all error responses
-        $exceptions->respond(function ($response) {
-            $response->headers->set('Access-Control-Allow-Origin', '*');
+        // Add CORS headers to all error responses (safety net when middleware doesn't run)
+        $exceptions->respond(function ($response, \Illuminate\Http\Request $request) {
+            $origin = $request->header('Origin');
+            $allowedOrigins = [
+                env('FRONTEND_URL', 'http://localhost:5173'),
+                'https://devomarelshahatportofolio.vercel.app',
+            ];
+            if ($origin && in_array($origin, $allowedOrigins)) {
+                $response->headers->set('Access-Control-Allow-Origin', $origin);
+            }
             $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
             $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
             return $response;
@@ -60,11 +70,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
             if ($request->is('api/*')) {
                 $status = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
-                $msg = $e->getMessage();
-                if (empty($msg) && $status === 500) {
-                    $msg = 'Internal server error';
+                if (config('app.debug')) {
+                    return response()->json(['error' => $e->getMessage()], $status);
                 }
-                return response()->json(['error' => $msg], $status);
+                return response()->json(['error' => 'Internal server error'], $status);
             }
         });
     })->create();

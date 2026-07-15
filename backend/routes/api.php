@@ -21,31 +21,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Auth Routes
-Route::get('fix-admin', function() {
-    \App\Models\User::where('email', 'admin@omar.dev')->update(['role' => 'admin']);
-    return response()->json(['message' => 'Admin role fixed']);
-});
-
-Route::get('test-mail', function() {
-    try {
-        $resend = app(\App\Services\ResendService::class);
-        $result = $resend->sendEmail(
-            'mrmhmdalshhatly@gmail.com',
-            'Test from Railway ' . now()->toDateTimeString(),
-            '<p>If you see this, Resend is working on Railway.</p>'
-        );
-        return response()->json(['success' => true, 'id' => $result->id ?? 'sent']);
-    } catch (\Exception $e) {
-        return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
-    }
-});
-
 Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'
 ], function ($router) {
     Route::post('register/', [AuthController::class, 'register']);
-    Route::post('login/', [AuthController::class, 'login']);
+    Route::post('login/', [AuthController::class, 'login'])->middleware('throttle:login');
     Route::post('logout/', [AuthController::class, 'logout']);
     Route::post('refresh/', [AuthController::class, 'refresh']);
     Route::match(['get', 'post'], 'me/', [AuthController::class, 'me']);
@@ -62,7 +43,7 @@ Route::get('config/imgbb-key', function (ApiKeyRotationService $rotation) {
         return response()->json(['key' => $keyModel->key]);
     }
 
-    return response()->json(['key' => env('IMGBB_API_KEY', '8b3c2419670d982a3cc27940c66a65e5')]);
+    return response()->json(['key' => env('IMGBB_API_KEY')]);
 });
 Route::get('projects/', [ProjectController::class, 'index']);
 Route::get('projects/{project}/', [ProjectController::class, 'show']);
@@ -70,12 +51,12 @@ Route::get('skills/', [SkillController::class, 'index']);
 Route::get('services/', [ServiceController::class, 'index']);
 Route::get('site-content/', [SiteContentController::class, 'index']);
 Route::get('testimonials/', [TestimonialController::class, 'index']);
-Route::post('messages/', [MessageController::class, 'store']);
-Route::post('contact/', [MessageController::class, 'store']);
+Route::post('messages/', [MessageController::class, 'store'])->middleware('throttle:contact');
+Route::post('contact/', [MessageController::class, 'store'])->middleware('throttle:contact');
 Route::post('track/', [AnalyticsController::class, 'track']);
-Route::post('ai/chat/', [AiChatController::class, 'chat']);
+Route::post('ai/chat/', [AiChatController::class, 'chat'])->middleware('throttle:ai-chat');
 Route::get('ai/providers/', [AiChatController::class, 'providers']);
-Route::post('leads/submit/', [LeadController::class, 'store']);
+Route::post('leads/submit/', [LeadController::class, 'store'])->middleware('throttle:contact');
 Route::get('experiences/', [ExperienceController::class, 'index']);
 Route::get('public-profile/', function () {
     $user = \App\Models\User::first();
@@ -89,7 +70,7 @@ Route::get('public-profile/', function () {
 
 
 // Protected Admin Routes
-Route::group(['middleware' => 'auth:api'], function() {
+Route::group(['middleware' => ['auth:api', 'throttle:api']], function() {
     Route::apiResource('projects', ProjectController::class)->except(['index', 'show']);
     Route::apiResource('skills', SkillController::class)->except(['index']);
     Route::apiResource('services', ServiceController::class)->except(['index']);
@@ -106,8 +87,12 @@ Route::group(['middleware' => 'auth:api'], function() {
     Route::post('api-keys/reset/', [ApiKeyController::class, 'resetLimits']);
     Route::apiResource('api-keys', ApiKeyController::class);
 
-    // Team Management
-    Route::apiResource('team', TeamController::class);
+    // Team Management (index is accessible to all auth users, write operations require admin)
+    Route::get('team/', [TeamController::class, 'index']);
+    Route::get('team/{team}/', [TeamController::class, 'show'])->middleware('admin');
+    Route::post('team/', [TeamController::class, 'store'])->middleware('admin');
+    Route::put('team/{team}/', [TeamController::class, 'update'])->middleware('admin');
+    Route::delete('team/{team}/', [TeamController::class, 'destroy'])->middleware('admin');
 
     // Media Upload
     Route::post('upload/', [MediaController::class, 'upload']);

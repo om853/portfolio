@@ -13,13 +13,19 @@ class ResendService
 
     public function __construct()
     {
-        $this->apiKey = env('MAILERSEND_API_KEY', 'mlsn.c6a4446e6a91bf0a81e0262020e014bdf2761cec897c66655473a759dfc7d8d0');
-        $this->fromEmail = env('MAILERSEND_FROM_EMAIL', 'MS_MUlyNh@test-65qngkdq9xwlwr12.mlsender.net');
+        $this->apiKey = env('MAILERSEND_API_KEY');
+        $this->fromEmail = env('MAILERSEND_FROM_EMAIL');
         $this->client = new Client(['base_uri' => 'https://api.mailersend.com']);
     }
 
     public function sendEmail($to, $subject, $html, $from = null)
     {
+        if (!$this->apiKey) {
+            throw new \RuntimeException('MAILERSEND_API_KEY is not set. Add it to your .env or Railway environment variables.');
+        }
+        if (!$from && !$this->fromEmail) {
+            throw new \RuntimeException('MAILERSEND_FROM_EMAIL is not set. Add it to your .env or Railway environment variables.');
+        }
         $from = $from ?: $this->fromEmail;
 
         try {
