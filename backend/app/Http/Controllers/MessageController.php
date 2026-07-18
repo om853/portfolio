@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\NewContactNotification;
 use App\Services\ResendService;
 
@@ -37,7 +36,7 @@ class MessageController extends Controller
             );
             $resend = app(ResendService::class);
             $resend->sendEmail(
-                'mrmhmdalshhatly@gmail.com',
+                env('MAIL_ADMIN_EMAIL', 'mrmhmdalshhatly@gmail.com'),
                 "New Contact Message from {$validated['name']}",
                 $notification->buildHtml()
             );

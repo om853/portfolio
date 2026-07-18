@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\LoginNotification;
 use App\Services\ResendService;
 
@@ -39,7 +38,7 @@ class AuthController extends Controller
                     );
                     $resend = app(ResendService::class);
                     $resend->sendEmail(
-                        'mrmhmdalshhatly@gmail.com',
+                        env('MAIL_ADMIN_EMAIL', 'mrmhmdalshhatly@gmail.com'),
                         "Dashboard Login: " . $loggedUser->name,
                         $notification->buildHtml()
                     );

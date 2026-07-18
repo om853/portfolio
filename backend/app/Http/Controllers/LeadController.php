@@ -36,7 +36,7 @@ class LeadController extends Controller
             $resend = app(ResendService::class);
             $html = $this->buildLeadEmailHtml($lead, 'New Lead Received');
             $resend->sendEmail(
-                'mrmhmdalshhatly@gmail.com',
+                env('MAIL_ADMIN_EMAIL', 'mrmhmdalshhatly@gmail.com'),
                 "New Lead: {$lead->name} ({$lead->company})",
                 $html
             );
@@ -83,7 +83,7 @@ class LeadController extends Controller
                 $resend = app(ResendService::class);
                 $html = $this->buildLeadUpdateEmailHtml($lead, $changes);
                 $resend->sendEmail(
-                    'mrmhmdalshhatly@gmail.com',
+                    env('MAIL_ADMIN_EMAIL', 'mrmhmdalshhatly@gmail.com'),
                     "Lead Updated: {$lead->name} ({$lead->company})",
                     $html
                 );
